@@ -130,41 +130,39 @@ void matrix::set_out_separator(const char sep)
 void matrix::make_matrix_data(int h, int w, double d)
 {
     matrix res(h,w);
-    res.info();
-    for(int i =0; i < h; i++)
+    for(int i = 0; i < h; i++)
         for(int j =0; j < w; j++)
-            res.set_data(i,j,d);
+            res.data[i][j] = d;
     *this = res;
 };
 
 
 void matrix::insert_array_to_matrix_column(int index_column, double* arr, int arr_length)///overwrite and fit to matrix.height();
 {
-    if(arr_length > this->get_height())
+    if(arr_length > height)
         std::cout << "matrix::insert_array_to_matrix_column(int index_column, double* arr, int length) WARNING array cut to matrix.height()\n";
-    for(int i = 0; i < this->get_height(); i++)
-        this->set_data(i,index_column, arr[i]);
+    for(int i = 0; i < this->height; i++)
+        this->data[i][index_column] = arr[i];
 }
 
 void matrix::insert_array_to_matrix_row(int index_row, double* arr, int arr_length)
 {
-    if(arr_length > this->get_width())
+    if(arr_length > this->width)
         std::cout << "matrix::insert_array_to_matrix_column(int index_column, double* arr, int length) WARNING array cut to matrix.width()\n";
-    for(int i = 0; i < this->get_width(); i++)
-        this->set_data(index_row, i, arr[i]);
+    for(int i = 0; i < this->width; i++)
+        this->data[index_row][i]= arr[i];
 }
 
 void matrix::get_array_from_column(int index_column, double* arr)///overwrite and fit to matrix.height();
 {
-    std::cout << "DEBUG\n";
-    for(int i = 0; i < this->get_height(); i++)
-        arr[i] = this->get_data(i, index_column);
+    for(int i = 0; i < this->height; i++)
+        arr[i] = this->data[i][index_column];
 }
 
 void matrix::get_array_from_row(int index_row, double* arr)///overwrite and fit to matrix.width();
 {
-    for(int i = 0; i < this->get_width(); i++)
-        arr[i] = this->get_data(index_row, i);
+    for(int i = 0; i < this->width; i++)
+        arr[i] = this->data[index_row][i];
 }
 
 
@@ -374,20 +372,19 @@ matrix matrix::abs_column(int index_column)
 {
     matrix res = *this;
     for(int i = 0; i < height; i++)
-        res.set_data(i,index_column, fabs(this->get_data(i,index_column)));
+        res.data[i][index_column] = fabs(this->data[i][index_column]);
     return res;
 };
 
 void matrix::abs_index_column(int index_column)
 {
     for(int i = 0; i < height; i++)
-        this->set_data(i,index_column, fabs(this->get_data(i,index_column)));
+        this->data[i][index_column] = fabs(this->data[i][index_column]);
 }
 
 matrix matrix::transpose()
 {
     matrix T(this->width, this->height);
-        //T.set_out_separator(this->out_separator);
         for (int i = 0;  i < this->height; i++)
             for(int j = 0; j < this->width; j++)
                 T.data[j][i] = this->data[i][j];
@@ -616,25 +613,25 @@ matrix matrix::average_column()
 
 void matrix::column_multiply(int index_column, double m)
 {
-    if(index_column <= this->get_width())
+    if(index_column <= this->width)
     {
-        for(int i = 0; i < this->get_height(); i++)
-            this->set_data(i, index_column, this->get_data(i, index_column) * m);
+        for(int i = 0; i < this->height; i++)
+            this->data[i][index_column] = this->data[i][index_column] * m;
     }else{
         std::cout << "matrix::column_multiply(int index_column, double m) -> matrix_width < index_column!, max index_column taken\n";
-        this->column_multiply(this->get_width()-1, m);
+        this->column_multiply(this->width-1, m);
     }
 }
 
 void matrix::column_shift(int index_column, double sh)
 {std::cout << "column_shift()\n";
-    if(index_column <= this->get_width())
+    if(index_column <= this->width)
     {
-        for(int i = 0; i < this->get_height(); i++)
-            this->set_data(i, index_column, this->get_data(i, index_column) + sh);
+        for(int i = 0; i < this->height; i++)
+            this->data[i][index_column] += sh;
     }else{
         std::cout << "matrix::column_shift(int index_column, double sh) -> matrix_width < index_column!, max index_column taken\n";
-        this->column_shift(this->get_width()-1, sh);
+        this->column_shift(this->width-1, sh);
     }
 }
 
@@ -677,8 +674,8 @@ matrix matrix::matrix_exponential(int index_order)
 void matrix::Fibonachi2x2(int f_number)
 {
     matrix base(2,2);
-        base.set_data(0,0, 1.0); base.set_data(0,1, 1.0);
-        base.set_data(1,0, 1.0); base.set_data(1,1, 0.0);
+        base.data[0][0] = 1.0; base.data[0][1] = 1.0;
+        base.data[1][0] = 1.0; base.data[1][1] = 0.0;
             std::cout << base << std::endl;
 
     if(f_number == 0)
@@ -695,11 +692,11 @@ matrix matrix::sort_by_column_index(int index_column)
     matrix result;
     result = *this;
 
-    for (int idx_i = 0; idx_i < result.get_height() - 1; idx_i++)
+    for (int idx_i = 0; idx_i < result.height - 1; idx_i++)
     {
-        for (int idx_j = 0; idx_j < result.get_height() - idx_i - 1; idx_j++)
+        for (int idx_j = 0; idx_j < result.height - idx_i - 1; idx_j++)
         {
-            if (result.get_data(idx_j + 1, index_column) < result.get_data(idx_j, index_column))
+            if (result.data[idx_j + 1][index_column] < result.data[idx_j][index_column])
             {
                 //result.swap_elements(idx_j, index_column, idx_j + 1,index_column);
                 result.swap_rows(idx_j, idx_j + 1);
@@ -797,7 +794,7 @@ matrix matrix::get_matrix_part(int h1, int h2, int w1, int w2)///from h1,w1 to h
         matrix r(h2-h1, w2-w1); //cout << h1 << "\t" << h2 << "\t" << w1 << "\t" << w1 << endl;
         for(int i = h1; i < h2; i++)
             for(int j = w1; j < w2; j++)
-               r.set_data(i - h1, j - w1, data[i][j]);
+               r.data[i - h1][j - w1] = data[i][j];
         return r;
         }
     }
@@ -844,7 +841,7 @@ matrix matrix::merge_height(const matrix B, int pozition_row)
 };
 
 matrix matrix::merge_height(matrix B)///end
-    {return this->merge_height(B, this->get_height());}
+    {return this->merge_height(B, this->height);}
 
 matrix matrix::merge_width(matrix B, int pozition_column)
 {
@@ -861,7 +858,6 @@ matrix matrix::merge_width(matrix B, int pozition_column)
         if(pozition_column >= 0)
         {
             matrix AB(height, width + B.width);
-                //AB.set_out_separator(this->out_separator);
 
             for(int i = 0; i < height; i++)
             {
@@ -886,7 +882,7 @@ matrix matrix::merge_width(matrix B, int pozition_column)
 };
 
 matrix matrix::merge_width(matrix B)///end
-    {return this->merge_width(B, this->get_width());}
+    {return this->merge_width(B, this->width);}
 
 void matrix::merge_height(matrix A, matrix B, int pozition_row)
 {//cout << "MERGE!!!\n" ;//<< pozition_row << endl;
@@ -906,7 +902,6 @@ void matrix::merge_height(matrix A, matrix B, int pozition_row)
     if(pozition_row <=A.height && pozition_row >= 0 && A.height != 0 && B.height != 0)
     {//cout << "row pozition = " << pozition_row << endl;
     matrix AB(A.height + B.height, A.width);
-        //AB.set_out_separator(this->out_separator);
 
     for(int j = 0; j < A.width; j++)
         for(int i = 0; i < pozition_row; i++)
@@ -930,7 +925,6 @@ void matrix::merge_width(matrix A, matrix B, int pozition_column)
     if(pozition_column <=A.width && pozition_column >= 0)
     {
     matrix AB(A.height, A.width+B.width);
-        //AB.set_out_separator(this->out_separator);
     for(int i = 0; i < A.height; i++)
     {//cout << "fori = " << i << endl;
         for(int j = 0; j < pozition_column; j++)
@@ -1004,32 +998,32 @@ matrix matrix::array_to_matrix_row(double* arr, int length)
 void matrix::array_to_matrix_column(double* arr, int length)
 {
     matrix r(length, 1);
-    for(int i = 0; i < r.get_height(); i++)
-        r.set_data(i, 0, arr[i]);
+    for(int i = 0; i < r.height; i++)
+        r.data[i][0] = arr[i];
     *this = r;
 };
 
 matrix matrix::matrix_column_from_array(double* arr, int length)
 {
     matrix r(length, 1);
-    for(int i = 0; i < r.get_height(); i++)
-        r.set_data(i, 0, arr[i]);
+    for(int i = 0; i < r.height; i++)
+        r.data[i][0] = arr[i];
     return r;
 };
 
 void matrix::array_to_matrix_row(double* arr, int length)
 {
     matrix r(1, length);
-    for(int i = 0; i < r.get_width(); i++)
-        r.set_data(0, i, arr[i]);
+    for(int i = 0; i < r.width; i++)
+        r.data[0][i] = arr[i];
     *this = r;
 };
 
 matrix matrix::matrix_row_from_array(double* arr, int length)
 {
     matrix r(1, length);
-    for(int i = 0; i < r.get_width(); i++)
-        r.set_data(0, i, arr[i]);
+    for(int i = 0; i < r.width; i++)
+        r.data[0][i] = arr[i];
     return r;
 };
 
