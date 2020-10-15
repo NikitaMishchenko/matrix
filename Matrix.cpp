@@ -717,18 +717,18 @@ void matrix::erase_column(int w)
 {
     if(w < width)
     {
-    matrix result(height, width-1);
-    for(int i = 0; i < height; i++)
-        for(int j = 0; j < width-1; j++)
-            if(j < w)
-            {
-                result.data[i][j] = data[i][j];
-            }else{
-                result.data[i][j] = data[i][j+1];
-            }
-    *this = result;
+        matrix result(height, width-1);
+        for(int i = 0; i < height; i++)
+            for(int j = 0; j < width-1; j++)
+                if(j < w)
+                {
+                    result.data[i][j] = data[i][j];
+                }else{
+                    result.data[i][j] = data[i][j+1];
+                }
+        *this = result;
     }else{
-    std::cerr << "matrix erase_column out of range matrix not changed!\n";
+        std::cerr << "matrix erase_column out of range matrix not changed!\n";
     }
 };
 
@@ -777,15 +777,27 @@ matrix matrix::get_matrix_part(int h1, int h2, int w1, int w2)///from h1,w1 to h
             if(w1 > w2)
                 {k = w2;w2 = w1;w1 = k;}
             if(w2 > width) w2 = width;
-        ///func
-        matrix r(h2-h1, w2-w1); //cout << h1 << "\t" << h2 << "\t" << w1 << "\t" << w1 << endl;
-        for(int i = h1; i < h2; i++)
-            for(int j = w1; j < w2; j++)
-               r.data[i - h1][j - w1] = data[i][j];
-        return r;
+            ///func
+            matrix r(h2-h1, w2-w1);
+            for(int i = h1; i < h2; i++)
+                for(int j = w1; j < w2; j++)
+                   r.data[i - h1][j - w1] = data[i][j];
+            return r;
         }
     }
     return *this;
+};
+
+void matrix::replace_data_part(matrix &n, int h_from, int h_to, int w_from, int w_to)
+{
+    /// if n_data > sizes fit to *this
+    if(h_from >= 0 && h_to <= height && w_from >=0 && w_to <= width){
+        for(int i = h_from; i <= h_to; i++)
+            for(int j = w_from; j <= w_to; j++)
+                data[i][j] = n.data[i-h_from][j-w_from];
+    }else{
+        std::cerr << "replace_data_part() wrong parameters same matrix returned\n";
+    }
 };
 
 matrix matrix::merge_height(const matrix B, int pozition_row)
@@ -818,8 +830,8 @@ matrix matrix::merge_height(const matrix B, int pozition_row)
 
             return AB;
         }else{
-        std::cerr << "merge_height pozition_row < 0! Same matrix returned\n";
-        return *this;
+            std::cerr << "merge_height pozition_row < 0! Same matrix returned\n";
+            return *this;
         }
     }else{
         std::cerr << "merge_height different width of matrixes! Same matrix returned\n";

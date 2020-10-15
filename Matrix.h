@@ -108,6 +108,8 @@ public:
     matrix get_column(int w);
     matrix get_matrix_part(int h1, int h2, int w1, int w2); ///simple part from h1,w1 to h2,w2 ///доставляет часть матрицы начиная со столбца h1 до h2 и со строки w1 до w2
 
+    void replace_data_part(matrix &n_data, int h_from, int h_to, int w_from, int w_to);
+
     matrix merge_height(const matrix B, int pozition_row); ///отлажено
         matrix merge_height(matrix B);///в конец
     matrix merge_width(matrix B, int pozition_column); ///отлажено
