@@ -146,7 +146,5 @@ public:
 
 ///outer
     bool FileExists(const std::string fname);
-    bool FileExists1(const std::string fname);
-    bool FileExists2(const char *fname);
 
 #endif // MATRIX_H_INCLUDED

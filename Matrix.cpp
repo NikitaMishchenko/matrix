@@ -1054,14 +1054,6 @@ void matrix::Find_Size_of_matrix_file(const std::string file_name)
     fin.close();//cout << "height = " << height << "\t";
 
     width = word_number_in_string(buff);
-    /*fin.open(file_name);
-    while(!fin.eof())
-    {
-        fin >> buff;
-        width++;
-    }
-    width = (int)width/height;
-    fin.close();*/
 }
 
 void matrix::Find_Size_of_matrix_emptstringend_file(const std::string file_name, int emptstringend_num)
@@ -1071,24 +1063,17 @@ void matrix::Find_Size_of_matrix_emptstringend_file(const std::string file_name,
     height = 0; width = 0;
     while(!fin1.eof())
     {
-            getline(fin1, buff);
-            height++;
+        getline(fin1, buff);
+        height++;
     }
     height-=emptstringend_num;
     fin1.close();//cout << "height = " << height << "\t";
 
-    std::ifstream fin2(file_name);
-    while(!fin2.eof())
-    {
-        fin2 >> buff;
-            width++;
-    }//cout << "elcount = " << width << endl;
-    width = width/height;
-    fin2.close();//cout << "width = " << width << endl;
+    width = word_number_in_string(buff);
 }
 
 void matrix::Load_matrix(const std::string file_name)
-{std::cout << "Load matrix started\t" << file_name <<"\t";
+{//std::cout << "Load matrix started\t" << file_name <<"\t";
     if(FileExists(file_name.c_str()))
     {
         Find_Size_of_matrix_file(file_name);//cout << "1!!!!!!!!!!!!\n";
@@ -1104,12 +1089,12 @@ void matrix::Load_matrix(const std::string file_name)
     }else{
         matrix m_empty;
         *this = m_empty;
-        std::cout << "WARNING File do not exist! \t" << file_name << "\tEmpty matrix returned\n";
+        std::cerr << "WARNING File do not exist! \t" << file_name << "\tEmpty matrix returned\n";
     }
-    std::cout << "Matrix loaded\n";
+    //std::cout << "Matrix loaded\n";
 }
 void matrix::Load_matrix_emptstringend(const std::string file_name, int emptstringend_num)
-{std::cout << "Load matrix started\t" << file_name <<"\t";
+{//std::cout << "Load matrix started\t" << file_name <<"\t";
     if(FileExists(file_name.c_str()))
     {
         Find_Size_of_matrix_emptstringend_file(file_name, emptstringend_num);//cout << "1!!!!!!!!!!!!\n";
@@ -1125,25 +1110,25 @@ void matrix::Load_matrix_emptstringend(const std::string file_name, int emptstri
     }else{
         matrix m_empty;
         *this = m_empty;
-        std::cout << "No such file! \t" << file_name << "\tEmpty matrix returned\n";
+        std::cerr << "No such file! \t" << file_name << "\tEmpty matrix returned\n";
     }
-    std::cout << "Matrix loaded\n";
+    //std::cout << "Matrix loaded\n";
 }
 
 void matrix::Save_matrix(const std::string file_name)
-{std::cout << "Save matrix started\t" << file_name <<"\t";
+{//std::cout << "Save matrix started\t" << file_name <<"\t";
     std::ofstream fout(file_name);
         fout << *this;
     fout.close();
-    std::cout << "Matrix saved\n";
+    //std::cout << "Matrix saved\n";
 }
 void matrix::Save_matrix_end(const std::string file_name)
 {
-    std::cout << "Save matrix end started\t" << file_name <<"\t";
+    //std::cout << "Save matrix end started\t" << file_name <<"\t";
     std::ofstream fout(file_name, std::ios::app);
         fout << *this << std::endl;
     fout.close();
-    std::cout << "Matrix saved\n";
+    //std::cout << "Matrix saved\n";
 };
 
 
@@ -1156,19 +1141,4 @@ bool FileExists(const std::string fname)///old const char *fname - > string
 {
     std::ifstream f(fname.c_str());
     return f.good();
-}
-
-///io.h
-
-bool FileExists1(const std::string fname)
-{
-    std::ifstream file;
-    file.open(fname);
-    file.close();
-    if (file)
-    {
-        std::cout << "Success.\n";
-        return true;
-    }
-    return false;
 }
