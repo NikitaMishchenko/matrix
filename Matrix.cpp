@@ -10,10 +10,10 @@ char  matrix::out_separator = ' ';
 matrix::matrix() ///empty
 {
     height = 0; width = 0;
-    data = NULL;
+    data = nullptr;
 };
 
-void matrix::matrix_alloc(int h, int w)
+void matrix::matrix_alloc(const int h, const int w)
 {
     data = new double* [h];
     for (int i = 0; i < h; i++)
@@ -75,17 +75,16 @@ matrix::~matrix() ///destructor
 };
 
 matrix::matrix(const matrix &copy_A) ///copy
-{//cout << "copy_matrix\n";
+{
     data = new double* [copy_A.height];
+    height = copy_A.height;
+    width = copy_A.width;
     for (int i = 0; i < copy_A.height; i++)
     {
         data[i] = new double[copy_A.width];
             for (int j = 0; j < copy_A.width; j++)
                 data[i][j] = copy_A.data[i][j];
     }
-    height = copy_A.height;
-    width = copy_A.width;
-    //out_separator = copy_A.out_separator;
 }
 
 ///primary
@@ -94,12 +93,10 @@ void matrix::delete_data()
     for (int i = 0; i < this->height; i++)
         delete [] data[i];
             delete [] data;
-    height = 0;width = 0;
+    height = 0; width = 0;
     data = new double* [height];
     for (int i = 0; i < height; i++)
-    {
         data[i] = new double[width];
-    }
 };
 
 int matrix::get_height() const
@@ -123,24 +120,19 @@ void matrix::set_data(int i, int j, double d)
 void matrix::set_out_separator(const char sep)
     {out_separator = sep;}
 
-//void matrix::set_column_data(int h, int w, double data)
-//{
-//};
-
 void matrix::make_matrix_data(int h, int w, double d)
 {
-    matrix res(h,w);
+    matrix res(h, w);
     for(int i = 0; i < h; i++)
-        for(int j =0; j < w; j++)
+        for(int j = 0; j < w; j++)
             res.data[i][j] = d;
     *this = res;
 };
 
-
 void matrix::insert_array_to_matrix_column(int index_column, double* arr, int arr_length)///overwrite and fit to matrix.height();
 {
     if(arr_length > height)
-        std::cout << "matrix::insert_array_to_matrix_column(int index_column, double* arr, int length) WARNING array cut to matrix.height()\n";
+        std::cerr << "matrix::insert_array_to_matrix_column(int index_column, double* arr, int length) WARNING array cut to matrix.height()\n";
     for(int i = 0; i < this->height; i++)
         this->data[i][index_column] = arr[i];
 }
@@ -148,7 +140,7 @@ void matrix::insert_array_to_matrix_column(int index_column, double* arr, int ar
 void matrix::insert_array_to_matrix_row(int index_row, double* arr, int arr_length)
 {
     if(arr_length > this->width)
-        std::cout << "matrix::insert_array_to_matrix_column(int index_column, double* arr, int length) WARNING array cut to matrix.width()\n";
+        std::cerr << "matrix::insert_array_to_matrix_column(int index_column, double* arr, int length) WARNING array cut to matrix.width()\n";
     for(int i = 0; i < this->width; i++)
         this->data[index_row][i]= arr[i];
 }
@@ -165,94 +157,99 @@ void matrix::get_array_from_row(int index_row, double* arr)///overwrite and fit 
         arr[i] = this->data[index_row][i];
 }
 
-
 double matrix::get_max_el_column(int index_column)
-{//cout << "double matrix::get_max_el_column(int index_column)\n";
-if(height != 0)
-    {double m = data[0][index_column];
-    for(int i = 1; i < height; i++)
-        if(data[i][index_column] > m)
-            m = data[i][index_column];
-    return m;}
-return -999999;
+{
+    if(height != 0)
+    {
+        double m = data[0][index_column];
+        for(int i = 1; i < height; i++)
+            if(data[i][index_column] > m)
+                m = data[i][index_column];
+        return m;
+    }
+    return -999999;
 };
 
 double matrix::get_max_el_column_gap(int index_column, int gap_index_from, int gap_index_to)
 {
-if(height != 0)
-    {double m = data[gap_index_from][index_column];
-    for(int i = gap_index_from+1; i < gap_index_to; i++)
-        if(data[i][index_column] > m)
-            m = data[i][index_column];
-    return m;}
-return -999999;
+    if(height != 0)
+    {
+        double m = data[gap_index_from][index_column];
+        for(int i = gap_index_from+1; i < gap_index_to; i++)
+            if(data[i][index_column] > m)
+                m = data[i][index_column];
+        return m;
+    }
+    return -999999;
 }
 
 double matrix::get_min_el_column(int index_column)
-{//cout << "double matrix::get_min_el_column(int index_row)\n";
-if(width != 0)
-    {double m = data[0][index_column];
-    for(int i = 1; i < height; i++)
-        {
-        if(data[i][index_column] < m)
-            m = data[i][index_column];//cout << data[i][index_column] << endl;
-        }
-    return m;}
-return -999999;
+{
+    if(width != 0)
+    {
+        double m = data[0][index_column];
+        for(int i = 1; i < height; i++)
+            if(data[i][index_column] < m)
+                m = data[i][index_column];
+        return m;
+    }
+    return -999999;
 };
-
 
 int matrix::get_max_elind_column_gap(int index_column, int gap_index_from, int gap_index_to)
 {
     int index = gap_index_from;
-if(height != 0)
-    {double m = data[gap_index_from][index_column];
-    for(int i = gap_index_from+1; i < gap_index_to-1; i++)
-        if(data[i][index_column] > m)
-        {
-            m = data[i][index_column];
+    if(height != 0)
+    {
+        double m = data[gap_index_from][index_column];
+        for(int i = gap_index_from+1; i < gap_index_to-1; i++)
+            if(data[i][index_column] > m)
+            {
+                m = data[i][index_column];
                 index = i;
-        }
-    return index;}
-return -999999;
+            }
+        return index;
+    }
+    return -999999;
 };
 
 int matrix::get_min_elind_column_gap(int index_column, int gap_index_from, int gap_index_to)
 {
     int index = gap_index_from;
-if(height != 0)
-    {double m = data[gap_index_from][index_column];
-    for(int i = gap_index_from+1; i < gap_index_to-1; i++)
-        if(data[i][index_column] < m)
-        {
-            m = data[i][index_column];
-                index = i;
-        }
-    return index;}
-return -999999;
+    if(height != 0)
+    {
+        double m = data[gap_index_from][index_column];
+        for(int i = gap_index_from+1; i < gap_index_to-1; i++)
+            if(data[i][index_column] < m)
+            {
+                m = data[i][index_column];
+                    index = i;
+            }
+        return index;
+    }
+    return -999999;
 };
 
 ///OPERATORS
 matrix& matrix::operator= (const matrix& A)
-{//cout << "matrix::operator=\n";
-if( this != &A)
 {
-    for (int i = 0; i < this->height; i++) ///changed width ->height
-        delete [] data[i];
-    delete [] data;
-
-    //out_separator = A.out_separator;
-    height = A.height;
-    width = A.width;
-    data = new double* [height];
-    for (int i = 0; i < height; i++)
+    if( this != &A)
     {
-        data[i] = new double[width];
-            for (int j = 0; j < width; j++)
-                data[i][j] = A.data[i][j];
+        for (int i = 0; i < this->height; i++) ///changed width ->height
+            delete [] data[i];
+        delete [] data;
+
+        height = A.height;
+        width = A.width;
+        data = new double* [height];
+        for (int i = 0; i < height; i++)
+        {
+            data[i] = new double[width];
+                for (int j = 0; j < width; j++)
+                    data[i][j] = A.data[i][j];
+        }
     }
-}
-return *this;
+    return *this;
 };
 
  matrix& matrix::operator+=(const matrix& A)
@@ -264,7 +261,7 @@ return *this;
                     data[i][j] = data[i][j]+ A.data[i][j];
         return *this;
     }else{
-        std::cout << "Warning! Different sizes of matrices << operator+= >> Same matrix returned" << std::endl;
+        std::cerr << "Warning! Different sizes of matrices << operator+= >> Same matrix returned" << std::endl;
         return *this;
     }
  };
@@ -294,23 +291,25 @@ matrix operator*(const double& a, const matrix& A)
 }
 
 matrix operator*(const matrix& A, const matrix& B)
-{//cout << "operator * curruped\n";
+{
 ///falls with no reason????? counted right
     matrix result(A.height, B.width);
-if(A.width == B.height)
-{
-    double buff = 0.0;
-    for(int i = 0; i < B.height; i++)
-        for(int j = 0; j < B.width; j++)
-        {
-            buff = 0.0;
-            for(int k = 0; k < B.height; k++)
-                buff += A.data[i][k] * B.data[k][j];
-            result.data[i][j] = buff;
-        }
-}
-else{std::cout << "Wrong matrix sizes in operator* A.height = "
-        << A.width  << "\tB.width = " << B.height << "\tEmpty matrix returned " << std::endl;}
+    if(A.width == B.height)
+    {
+        double buff = 0.0;
+        for(int i = 0; i < B.height; i++)
+            for(int j = 0; j < B.width; j++)
+            {
+                buff = 0.0;
+                for(int k = 0; k < B.height; k++)
+                    buff += A.data[i][k] * B.data[k][j];
+                result.data[i][j] = buff;
+            }
+    }
+    else{
+        std::cerr << "Wrong matrix sizes in operator* A.height = "
+            << A.width  << "\tB.width = " << B.height << "\tEmpty matrix returned " << std::endl;
+    }
     return result;
 };
 
@@ -321,7 +320,7 @@ matrix matrix::operator*=(const matrix& A)
         *this =  (*this * A);
         return *this;
     }else{
-        std::cout << "Different sizes of matix in << operator*= >>" << std::endl;
+        std::cerr << "Different sizes of matix in << operator*= >>" << std::endl;
         return *this;
     }
 }
@@ -347,7 +346,7 @@ matrix operator-(const matrix& A, const matrix& B)
     return result;
 };
 
-std::ostream & operator << (std::ostream &C, const matrix &A)
+std::ostream & operator<< (std::ostream &C, const matrix &A)
 {
     for (int i = 0; i < A.height; i++)
     {
@@ -359,7 +358,7 @@ std::ostream & operator << (std::ostream &C, const matrix &A)
     return C;
  };
 
-std::istream & operator >> (std::istream &C, matrix &A)
+std::istream & operator>> (std::istream &C, matrix &A)
 {
     for (int i = 0; i < A.height; i++)
         for (int j = 0; j < A.width; j++)
@@ -399,17 +398,18 @@ void matrix::transpose(matrix& m)
 matrix matrix::minor(int l,int k)
 {
     int n = this->height-1;
-    int s1 = 0; int s2 = 0; int p = 0;
+    int s1 = 0; int s2 = 0;
+    int p = 0;
     matrix M(n);
     for (int i = 0; i < n; i++)
     {
         if(i==l){s1=1;};
-        p=0;
+        p = 0;
         for (int j = 0; j < n; j++)
         {
-            if (j==k){s2=1; p++;};
-            if(p%2 == 0 ){s2=0;};
-            M.data[i][j]=this->data[i+s1][j+s2];
+            if (j==k){s2 = 1; p++;};
+            if(p%2 == 0){s2 = 0;};
+            M.data[i][j] = this->data[i+s1][j+s2];
         }
     }
     return(M);
@@ -418,28 +418,28 @@ matrix matrix::minor(int l,int k)
 double matrix::determinant()
 {
     double d = 0;
-if(this->height == this->width)
-{
-    int n = this->height;
-    if (n>2)
+    if(this->height == this->width)
     {
-        for (int i = 0; i < n; i++)
+        int n = this->height;
+        if (n>2)
         {
-            matrix M(n-1);
-            M = this->minor(0,i);
-            d += pow(-1,i)*this->data[0][i] * M.determinant();
+            for (int i = 0; i < n; i++)
+            {
+                matrix M(n-1);
+                M = this->minor(0,i);
+                d += pow(-1,i)*this->data[0][i] * M.determinant();
+            }
+            return(d);
+        }
+        else
+        {
+            d=(this->data[0][0])*(this->data[1][1])-(this->data[0][1])*(this->data[1][0]);
         }
         return(d);
+    }else{
+        std::cerr << "ERR determinant() Matrix not squared!\n";
+        return(d);
     }
-    else
-    {
-        d=(this->data[0][0])*(this->data[1][1])-(this->data[0][1])*(this->data[1][0]);
-    }
-    return(d);
-}else{
-    std::cout << "Matrix not squared!\n";
-    return(d);
-}
 };
 
 void matrix::determinant( double& determinant)
@@ -448,21 +448,22 @@ void matrix::determinant( double& determinant)
 };
 
 matrix matrix::inverse()
-{//cout << "Inverse matrix started \t";
+{
     matrix R(this->height);
     if (this->determinant() == 0)
-    {std::cout << "Determinant = 0. No inverse matrix! Empty matrix returned! \n"; matrix O(this->height); return O;}
-    else
     {
+        std::cerr << "Determinant = 0. No inverse matrix! Empty matrix returned! \n";
+        return R;
+    }else{
         for (int i = 0; i < this->height; i++)
             for (int j = 0; j < this->width; j++)
             {
-                matrix M(height-1);
-                M=this->minor(i,j);
-                R.data[j][i] = pow(-1,i+j) * M.determinant();
+                matrix M(height - 1);
+                M = this->minor(i,j);
+                R.data[j][i] = ((i+j)%2 == 0 ? 1.0 : -1.0) * M.determinant(); ///changed pow(-1, i+j)
             }
-        R = R * (1/this->determinant());
-    return R;
+        R *= 1.0/this->determinant();
+        return R;
     }
 };
 
@@ -476,15 +477,14 @@ matrix matrix::elementwise_division(matrix B)
     if(height == B.height && width == B.width)
     {
         for(int i = 0; i < height; i++)
-            {for(int j = 0; j < width; j++)
-            {
-                std::cout << data[i][j] << "\t" <<  B.data[i][j] << "\t\t";
+        {
+            for(int j = 0; j < width; j++)
                 B.data[i][j] = data[i][j] / B.data[i][j];
-                std::cout << B.data[i][j] << std::endl;
-            }std::cout << std::endl;}
+
+        }
         return B;
     }else{
-        std::cout << "matrix::elementwise_division(matrix B) Different sizes same matrix returned\n";
+        std::cerr << "matrix::elementwise_division(matrix B) Different sizes same matrix returned\n";
         return *this;
     }
 };
@@ -510,7 +510,6 @@ int matrix::width_coord_of_max_elem_from_row(int column_index)
 
 void matrix::triangulation()
 {//https://pro-prof.com/forums/topic/matrix-triangulation
-    std::cout << "triangulation\n";
     if(this->height == this->width)
     {
         for(int i = 0 ; i < this->height; i++)
@@ -521,7 +520,7 @@ void matrix::triangulation()
                 ///домножение строки на число и сложение строк
                 for(int k = 0; k < this->height; k++)
                     this->data[k][j] -= this->data[k][i]*this->data[j][i]/this->data[i][i];
-            }//cout << *this << endl;
+            }
             this->triangulation();
         }
     }else{
@@ -531,70 +530,62 @@ void matrix::triangulation()
 
 void matrix::triangulation1(matrix &B)
 {
-const double elem_err = 0.0000000000001;
-std::cout << "matrix triangulation with elem_err = " << elem_err << "\n";
-if(width == height){
+    const double elem_err = 0.0000000000001;
+    //std::cout << "matrix triangulation with elem_err = " << elem_err << "\n";
+    if(width == height){
 
-    if(width > 2)///при 2 рекурсивно не вызывается - обрывается
-    {//cout << "matrix sizes>2x2!!!!\n";
-        //cout << "in matrix\n" << *this << endl;
-        //cout << "swap\n";
-        ///находим строку с максимальным диагональным элементом и переставим столбцы
-        int max_diag_elem = 0;
-        for(int j = 0; j < 1; j++)
-        {//cout << "j = " << j << endl;
-            for(int i = j; i < height-1; i++)///самый большой диагональный элемент в строке наверх
-            {//cout << "i = " << i << "\n";
-                if(data[max_diag_elem][j] < data[i+1][j])
-                    {max_diag_elem = i+1;std::cout << "new main element \t coordinate = " << max_diag_elem << "\telement = " << data[max_diag_elem][max_diag_elem] << std::endl;}
-                //cout << data[max_diag_elem][max_diag_elem] << "\t" <<  data[i+1][i+1] << "\tmax el num =" << max_diag_elem << endl;
-            }
-            this->swap_rows(j, max_diag_elem);
-            max_diag_elem = 0;
-        }//cout << "swapped\n" << *this << endl;
-
-        ///calc
-        double m = 0;
-        for(int i = 0+1; i < height; i++)///from second row
-        {std::cout << "i = " << i << std::endl;
-             m = -data[i][0]/data[0][0];
-            for(int j = 0; j < width; j++)///for row
-            {std::cout << "j = " << j << "\t";
-                //if(data[0][0] != 0)
-                //{
-
-                    std::cout << "m = " << m << std::endl;
-                    data[i][j] += data[0][j]*m;///minus norm first row
-                    //B.data[j][0] = B.data[j][0]*(double)m;
-
-                    if(fabs(data[i][j]) < elem_err)
-                        data[i][j] = 0;
-                //}
-            }
-        }
-        matrix M(width-1);
-
-        std::cout << "before triang\n" << *this << std::endl;
-        M = this->minor(0,0);
-
-        M.triangulation1(B);
-        std::cout << "after triang\n" << M <<std:: endl;
-
-        for(int i = 1; i < width; i++)
-            for(int j = 1; j < width; j++)
-                {
-                    data[i][j] = M.data[i-1][j-1];
-                    //cout << "index = " << i << "\t" << j << "\tdata = " << M.data[i-1][j-1] << endl;
+        if(width > 2)///при 2 рекурсивно не вызывается - обрывается
+        {//cout << "matrix sizes>2x2!!!!\n";
+            //cout << "in matrix\n" << *this << endl;
+            //cout << "swap\n";
+            ///находим строку с максимальным диагональным элементом и переставим столбцы
+            int max_diag_elem = 0;
+            for(int j = 0; j < 1; j++)
+            {//cout << "j = " << j << endl;
+                for(int i = j; i < height-1; i++)///самый большой диагональный элемент в строке наверх
+                {//cout << "i = " << i << "\n";
+                    if(data[max_diag_elem][j] < data[i+1][j])
+                        {max_diag_elem = i+1;std::cout << "new main element \t coordinate = " << max_diag_elem << "\telement = " << data[max_diag_elem][max_diag_elem] << std::endl;}
+                    //cout << data[max_diag_elem][max_diag_elem] << "\t" <<  data[i+1][i+1] << "\tmax el num =" << max_diag_elem << endl;
                 }
-    }else{std::cout << "2x2!!!!\n";
-    std::cout << *this << std::endl;
-        double m = 0;
-        m = -data[1][0]/data[0][0];
-        std::cout << "m2 = " << m << std::endl;
-        data[1][0] += data[0][0]*m;
-        data[1][1] += data[0][1]*m;
-    }
-}else{std::cout << "Not squared matrix original returned\n";}
+                this->swap_rows(j, max_diag_elem);
+                max_diag_elem = 0;
+            }
+
+            ///calc
+            double m = 0;
+            for(int i = 0+1; i < height; i++)///from second row
+            {std::cout << "i = " << i << std::endl;
+                 m = -data[i][0]/data[0][0];
+                for(int j = 0; j < width; j++)///for row
+                {std::cout << "j = " << j << "\t";
+                    //if(data[0][0] != 0)
+                    //{
+                        std::cout << "m = " << m << std::endl;
+                        data[i][j] += data[0][j]*m;///minus norm first row
+                        //B.data[j][0] = B.data[j][0]*(double)m;
+                        if(fabs(data[i][j]) < elem_err)
+                            data[i][j] = 0;
+                    //}
+                }
+            }
+            matrix M(width-1);
+            std::cout << "before triang\n" << *this << std::endl;
+            M = this->minor(0,0);
+            M.triangulation1(B);
+            std::cout << "after triang\n" << M <<std:: endl;
+            for(int i = 1; i < width; i++)
+                for(int j = 1; j < width; j++)
+                        data[i][j] = M.data[i-1][j-1];
+        }else{std::cout << "2x2!!!!\n";
+        std::cout << *this << std::endl;
+            double m = 0;
+            m = -data[1][0]/data[0][0];
+            std::cout << "m2 = " << m << std::endl;
+            data[1][0] += data[0][0]*m;
+            data[1][1] += data[0][1]*m;
+        }
+    }else{std::cout << "Not squared matrix original returned\n";}
 }
 
 matrix matrix::average_column()
@@ -606,7 +597,7 @@ matrix matrix::average_column()
         for(int i = 0; i < height; i++)
             sum += data[i][j];
         r.data[0][j] = sum/height;
-    sum = 0;
+        sum = 0;
     }
     return r;
 }
@@ -624,13 +615,13 @@ void matrix::column_multiply(int index_column, double m)
 }
 
 void matrix::column_shift(int index_column, double sh)
-{std::cout << "column_shift()\n";
+{
     if(index_column <= this->width)
     {
         for(int i = 0; i < this->height; i++)
             this->data[i][index_column] += sh;
     }else{
-        std::cout << "matrix::column_shift(int index_column, double sh) -> matrix_width < index_column!, max index_column taken\n";
+        std::cerr << "matrix::column_shift(int index_column, double sh) -> matrix_width < index_column!, max index_column taken\n";
         this->column_shift(this->width-1, sh);
     }
 }
@@ -648,17 +639,14 @@ matrix matrix::matrix_exponential(int index_order)
     {
         matrix res, m_powered;
         double k_factorial = 1.0;
-
         ///index_order  == 0
         res.make_matrix_data(height, width, 1.0);
-
         if(index_order >= 1)
         {
             res += *this;
             k_factorial = 1.0;
             m_powered = *this;
         }
-
         for(int i = 2; i < index_order; i++)
         {
             m_powered *= *this;
@@ -667,7 +655,7 @@ matrix matrix::matrix_exponential(int index_order)
         }
         return res;
     }
-   std::cout << "matrix not squared 0 returned\n";
+    std::cout << "matrix not squared 0 returned\n";
     return 0;
 };
 
@@ -676,7 +664,6 @@ void matrix::Fibonachi2x2(int f_number)
     matrix base(2,2);
         base.data[0][0] = 1.0; base.data[0][1] = 1.0;
         base.data[1][0] = 1.0; base.data[1][1] = 0.0;
-            std::cout << base << std::endl;
 
     if(f_number == 0)
         *this = base;
@@ -698,7 +685,6 @@ matrix matrix::sort_by_column_index(int index_column)
         {
             if (result.data[idx_j + 1][index_column] < result.data[idx_j][index_column])
             {
-                //result.swap_elements(idx_j, index_column, idx_j + 1,index_column);
                 result.swap_rows(idx_j, idx_j + 1);
             }
         }
@@ -711,19 +697,19 @@ void matrix::erase_row(int h)// - //minor 0,w
 {
     if(h < height)
     {
-    matrix result(height-1, width);
-    for(int i = 0; i < height-1; i++)
-    if( i < h )
-    {
-        for(int j = 0; j < width; j++)
-            result.data[i][j] = data[i][j];
-    }else{
-        for(int j = 0; j < width; j++)
-            result.data[i][j] = data[i+1][j];
-    }
-    *this = result;
-    }else{
-    std::cout << "matrix erase_row out of range matrix not changed!\n";
+        matrix result(height-1, width);
+        for(int i = 0; i < height-1; i++)
+        if( i < h )
+        {
+            for(int j = 0; j < width; j++)
+                result.data[i][j] = data[i][j];
+        }else{
+            for(int j = 0; j < width; j++)
+                result.data[i][j] = data[i+1][j];
+        }
+        *this = result;
+        }else{
+        std::cerr << "matrix erase_row out of range matrix not changed!\n";
     }
 }
 
@@ -742,7 +728,7 @@ void matrix::erase_column(int w)
             }
     *this = result;
     }else{
-    std::cout << "matrix erase_column out of range matrix not changed!\n";
+    std::cerr << "matrix erase_column out of range matrix not changed!\n";
     }
 };
 
@@ -753,24 +739,27 @@ matrix matrix::get_row(int h)
     {
         for(int i = 0; i < width; i++)
             row.data[0][i] = data[h][i];
-    }else{std::cout << "get_row out of range! zero returned\n";}
+    }else{
+        std::cerr << "get_row out of range! zero returned\n";
+    }
     return row;
 }
 
 matrix matrix::get_column(int w)
 {
     matrix column(height, 1);
-    if( w < width)
+    if(w < width)
     {
         for(int i = 0; i < height; i++)
             column.data[i][0] = data[i][w];
-    }else{std::cout << "get_column out of range! zero returned\n";}
+    }else{
+        std::cerr << "get_column out of range! zero returned\n";
+    }
     return column;
 }
 
 matrix matrix::get_matrix_part(int h1, int h2, int w1, int w2)///from h1,w1 to h2,w2
-{//cout << "get_matrix_part(int h1, int h2, int w1, int w2)\t" << h1 << " " << h2 << " " << w1 << " " << w2 << endl;
-    //this->info();
+{
     ///prep
     if(h1!=0 || h2!=0 || w1!=0 || w2!=0)///если процедура не требуется
     {
@@ -788,8 +777,6 @@ matrix matrix::get_matrix_part(int h1, int h2, int w1, int w2)///from h1,w1 to h
             if(w1 > w2)
                 {k = w2;w2 = w1;w1 = k;}
             if(w2 > width) w2 = width;
-        //cout << h1 << " " << h2 << " " << w1 << " " << w2 << endl;
-            //if(w1 > width-1) w1 = width-1;
         ///func
         matrix r(h2-h1, w2-w1); //cout << h1 << "\t" << h2 << "\t" << w1 << "\t" << w1 << endl;
         for(int i = h1; i < h2; i++)
@@ -831,11 +818,11 @@ matrix matrix::merge_height(const matrix B, int pozition_row)
 
             return AB;
         }else{
-        std::cout << "merge_height pozition_row < 0! Same matrix returned\n";
+        std::cerr << "merge_height pozition_row < 0! Same matrix returned\n";
         return *this;
         }
     }else{
-        std::cout << "merge_height different width of matrixes! Same matrix returned\n";
+        std::cerr << "merge_height different width of matrixes! Same matrix returned\n";
         return *this;
     }
 };
@@ -872,11 +859,11 @@ matrix matrix::merge_width(matrix B, int pozition_column)
             }
             return AB;
         }else{
-        std::cout << "merge_width pozition_column < 0! Same matrix returned\n";
+        std::cerr << "merge_width pozition_column < 0! Same matrix returned\n";
         return *this;
         }
     }else{
-        std::cout << "merge_width different height of matrixes! Same matrix returned\n";
+        std::cerr << "merge_width different height of matrixes! Same matrix returned\n";
         return *this;
     }
 };
@@ -924,21 +911,23 @@ void matrix::merge_width(matrix A, matrix B, int pozition_column)
 {
     if(pozition_column <=A.width && pozition_column >= 0)
     {
-    matrix AB(A.height, A.width+B.width);
-    for(int i = 0; i < A.height; i++)
-    {//cout << "fori = " << i << endl;
-        for(int j = 0; j < pozition_column; j++)
-            AB.data[i][j] = A.data[i][j];
-        //cout << "0\n" << AB << endl;
-        for(int j = pozition_column; j < pozition_column + B.width; j++)
-            AB.data[i][j] = B.data[i][j-pozition_column];
-        //cout  << "pc\n" << AB << endl;
-        for(int j = pozition_column + B.width; j < B.width + A.width; j++)
-            AB.data[i][j] = A.data[i][j-B.width];
-        //cout << "pc + Bw\n" << AB << endl;
+        matrix AB(A.height, A.width+B.width);
+        for(int i = 0; i < A.height; i++)
+        {//cout << "fori = " << i << endl;
+            for(int j = 0; j < pozition_column; j++)
+                AB.data[i][j] = A.data[i][j];
+            //cout << "0\n" << AB << endl;
+            for(int j = pozition_column; j < pozition_column + B.width; j++)
+                AB.data[i][j] = B.data[i][j-pozition_column];
+            //cout  << "pc\n" << AB << endl;
+            for(int j = pozition_column + B.width; j < B.width + A.width; j++)
+                AB.data[i][j] = A.data[i][j-B.width];
+            //cout << "pc + Bw\n" << AB << endl;
     }
     *this = AB;
-    }else{std::cout << "Merge_width wrong position_column!\n";}
+    }else{
+        std::cerr << "Merge_width wrong position_column!\n";
+    }
 };
 
 void matrix::swap_elements(int i1, int j1, int i2, int j2)
@@ -950,7 +939,7 @@ void matrix::swap_elements(int i1, int j1, int i2, int j2)
         this->data[i1][j1] = this->data[i2][j2];
         this->data[i2][j2] = buff;
     }else{
-    std::cout << "swap_elements left matrix ranges - original returned\n";
+        std::cerr << "swap_elements left matrix ranges - original returned\n";
     }
 }
 
@@ -961,7 +950,7 @@ void matrix::swap_columns(int w1, int w2)
     for(int i = 0; i < this->height; i++)
         swap_elements(i, w1, i, w2);
     }else{
-    std::cout << "swap_columns left matrix ranges - original returned\n";
+        std::cerr << "swap_columns left matrix ranges - original returned\n";
     }
 };
 
@@ -973,7 +962,7 @@ void matrix::swap_rows(int h1, int h2)
             for(int i = 0; i < this->width; i++)
                 swap_elements(h1, i, h2, i);
     }else{
-    std::cout << "swap_rows left matrix ranges - original returned\n";
+        std::cerr << "swap_rows left matrix ranges - original returned\n";
     }
 };
 
@@ -1028,6 +1017,30 @@ matrix matrix::matrix_row_from_array(double* arr, int length)
 };
 
 ///FILES
+int matrix::word_number_in_string(const std::string str)
+{
+    if(str.size() <= 0)
+        return 0;
+
+    int word_counter = 0;
+    bool cursor_is_in_word = true, prev_cursor_is_in_word = true;
+    for(int i = 0; i < static_cast<int>(str.size()); i++){
+        if(str[i] == ' ' || str[i] == '\t' || str[i] == out_separator)
+            cursor_is_in_word = false;
+        else
+            cursor_is_in_word = true;
+
+        if(prev_cursor_is_in_word == true && cursor_is_in_word == false )
+            word_counter++;
+
+        prev_cursor_is_in_word = cursor_is_in_word;
+    }
+
+    if(cursor_is_in_word == true)
+            word_counter++;
+    return word_counter;
+
+}
 void matrix::Find_Size_of_matrix_file(const std::string file_name)
 {
     std::string buff = "";
@@ -1035,19 +1048,20 @@ void matrix::Find_Size_of_matrix_file(const std::string file_name)
     height = 0; width = 0;
     while(!fin.eof())
     {
-            getline(fin, buff);
-            height++;
+        getline(fin, buff);
+        height++;
     }
     fin.close();//cout << "height = " << height << "\t";
 
-    fin.open(file_name);
+    width = word_number_in_string(buff);
+    /*fin.open(file_name);
     while(!fin.eof())
     {
-            fin >> buff;
-            width++;
+        fin >> buff;
+        width++;
     }
     width = (int)width/height;
-    fin.close();//  cout << "width = " << width << endl;
+    fin.close();*/
 }
 
 void matrix::Find_Size_of_matrix_emptstringend_file(const std::string file_name, int emptstringend_num)
@@ -1138,16 +1152,15 @@ void matrix::info()
     std::cout << "Matrix object\t height = " << this->height << "\twidth = " << this->width << std::endl;
 };
 
-bool FileExists(std::string fname)///old const char *fname - > string
+bool FileExists(const std::string fname)///old const char *fname - > string
 {
-    //return ::ifstream(fname, ios::in ) != NULL;////::ifstream(fname, ios::in | ios::nocreate) != NULL;
     std::ifstream f(fname.c_str());
     return f.good();
 }
 
 ///io.h
 
-bool FileExists1(std::string fname)
+bool FileExists1(const std::string fname)
 {
     std::ifstream file;
     file.open(fname);
@@ -1156,9 +1169,6 @@ bool FileExists1(std::string fname)
     {
         std::cout << "Success.\n";
         return true;
-       /*int n;
-        file >> n; // oops
-        std::cout << n;*/
     }
     return false;
 }

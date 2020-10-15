@@ -15,7 +15,7 @@ public:
 
 ///constructors//des//copy
     matrix(); ///empty
-    void matrix_alloc(int , int); ///создание пустых массивов размера
+    void matrix_alloc(const int , const int); ///создание пустых массивов размера
     matrix(int , int); ///rectangle
     matrix(int); ///Square matrix
     matrix(int n, char);///квадратная 'E' - единичная, 'n' - в столбцах натуральные числа с 1 по n.
@@ -128,6 +128,7 @@ public:
     matrix matrix_row_from_array(double* arr, int length);
 
 ///files
+    int word_number_in_string(const std::string str);
     void Find_Size_of_matrix_file(const std::string file_name); ///устанавливает height и width данной матрицы по размерам строк и столбца, конец файла на числе /// Можно оптимизировать
     void Find_Size_of_matrix_emptstringend_file(const std::string file_name, int emptstringend_num);///когда в конце файла пустая строка
     void Load_matrix(const std::string file_name); ///memory allocation
@@ -137,16 +138,15 @@ public:
     void Save_matrix_end(const std::string file_name); /// сохранение матрицы в конец файла
 
 ///TESTS
-
-
+    void TEST_math();
 
 ///extra
     void info();
 };
 
 ///outer
-    bool FileExists(std::string fname);
-    bool FileExists1(std::string fname);
+    bool FileExists(const std::string fname);
+    bool FileExists1(const std::string fname);
     bool FileExists2(const char *fname);
 
 #endif // MATRIX_H_INCLUDED
